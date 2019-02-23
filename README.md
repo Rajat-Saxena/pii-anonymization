@@ -32,7 +32,7 @@ Anonymized text:
 
 ### Example 2
 Source text:
-> Roy is an employee at Google. By mistake, he ppublicly shared his email roysmith@google.com and later deleted it.
+> Roy is an employee at Google. By mistake, he publicly shared his email roysmith@google.com and later deleted it.
 
 Anonymized text:
-> ANONYMIZED_VALUE is an employee at ANONYMIZED_VALUE. By mistake, he ppublicly shared his email ANONYMIZED_VALUE and later deleted it.
+> ANONYMIZED_VALUE is an employee at ANONYMIZED_VALUE. By mistake, he publicly shared his email ANONYMIZED_VALUE and later deleted it.
