@@ -56,6 +56,7 @@ public class PIIAnonymization
 
     private String classifyText(String text, StanfordCoreNLP pipeline)
     {
+        String replacementString = "ANONYMIZED_VALUE";
         // Create an empty Annotation
         annotation = new Annotation(text);
 
@@ -79,8 +80,7 @@ public class PIIAnonymization
                         token.ner().equalsIgnoreCase("STATE_OR_PROVINCE") ||
                         token.ner().equalsIgnoreCase("RELIGION"))
                 {
-                    text = text.replaceAll(Pattern.quote("\\b" + token.word() + "\\b"),
-                            "ANONYMIZED VALUE");
+                    text = text.replaceAll(Pattern.quote("\\b" + token.word() + "\\b"), replacementString);
                 }
             }
         }
