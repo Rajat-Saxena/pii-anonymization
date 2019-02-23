@@ -59,7 +59,7 @@ public class Main
 
             logger.info("Starting anonymization.");
             Long startTime = System.currentTimeMillis();
-            JavaPairRDD<String, Long> resultRdd = anonymization.anonymizeData(anonRdd);
+            JavaPairRDD<String, Long> resultRdd = PIIAnonymization.anonymizeData(anonRdd);
 
             resultDS = spark.createDataset(resultRdd.collect(), Encoders.tuple(Encoders.STRING(), Encoders.LONG()));
 

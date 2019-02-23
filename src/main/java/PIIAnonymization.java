@@ -3,6 +3,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.PairFlatMapFunction;
 import scala.Tuple2;
@@ -15,23 +16,19 @@ import java.util.regex.Pattern;
 
 public class PIIAnonymization
 {
-    private Properties props;
-    private StanfordCoreNLP pipeline;
-    private Annotation annotation;
+    private static Logger logger = Logger.getLogger(PIIAnonymization.class);
 
-    public PIIAnonymization()
+    public static JavaPairRDD<String, Long> anonymizeData(JavaPairRDD<String, Long> anonRdd)
     {
-        this.props = new Properties();
-        this.props.put("annotators", "tokenize, ssplit, ner, regexner");
-    }
+        Properties props;
+        props = new Properties();
+        props.put("annotators", "tokenize, ssplit, pos, lemma, ner, regexner");
 
-    public JavaPairRDD<String, Long> anonymizeData(JavaPairRDD<String, Long> anonRdd)
-    {
         anonRdd = anonRdd.mapPartitionsToPair((PairFlatMapFunction<Iterator<Tuple2<String,Long>>, String, Long>) partition ->
         {
             List<Tuple2<String, Long>> list = new ArrayList<>();
 
-            pipeline = new StanfordCoreNLP(props);
+            StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
 
             while (partition.hasNext())
             {
@@ -54,11 +51,11 @@ public class PIIAnonymization
         return anonRdd;
     }
 
-    private String classifyText(String text, StanfordCoreNLP pipeline)
+    private static String classifyText(String text, StanfordCoreNLP pipeline)
     {
         String replacementString = "ANONYMIZED_VALUE";
         // Create an empty Annotation
-        annotation = new Annotation(text);
+        Annotation annotation = new Annotation(text);
 
         // Run all annotators on this text
         pipeline.annotate(annotation);
@@ -80,6 +77,7 @@ public class PIIAnonymization
                         token.ner().equalsIgnoreCase("STATE_OR_PROVINCE") ||
                         token.ner().equalsIgnoreCase("RELIGION"))
                 {
+                    logger.info("Replaced " + token.word());
                     text = text.replaceAll(Pattern.quote("\\b" + token.word() + "\\b"), replacementString);
                 }
             }
